@@ -1,197 +1,935 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Porimap — Price Calculator</title>
-<style>
-  :root{
-    --bg:#FAFAF8; --card:#FFFFFF; --ink:#161816; --muted:#8A918D;
-    --line:#E2E4DE; --accent:#0f6a54; --field:#EDEFEA;
-  }
-  .dark{
-    --bg:#0B0D0C; --card:#111413; --ink:#EDEEEC; --muted:#7C857F;
-    --line:#1E2321; --accent:#2BA884; --field:#151918;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
-  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;
-    background:var(--bg);color:var(--ink);min-height:100vh;
-    -webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
-  header{border-bottom:1px solid var(--line)}
-  .bar{max-width:520px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
-  .brand{display:flex;align-items:center;gap:12px;min-width:0}
-  .mark{flex-shrink:0;width:8px;height:8px;border-radius:50%;background:var(--accent)}
-  .brand b{font-size:17px;font-weight:600;letter-spacing:-.02em}
-  .brand small{display:block;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:.02em}
-  #themeBtn{flex-shrink:0;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);
-    background:transparent;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center}
-  #themeBtn:active{transform:scale(.94)}
-  main{max-width:520px;margin:0 auto;padding:32px 24px 56px;display:grid;gap:36px}
-  main > *{min-width:0}
-  .eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--muted);margin-bottom:14px}
-  .field{min-width:0;background:var(--field);border:1px solid var(--line);border-radius:16px;
-    padding:6px 18px;display:flex;align-items:baseline;gap:10px;transition:border-color .2s}
-  .field:focus-within{border-color:var(--accent);background:var(--card)}
-  .field .unit{font-size:13px;color:var(--muted);flex-shrink:0}
-  input{flex:1;min-width:0;max-width:100%;border:none;background:transparent;color:var(--ink);
-    font-size:30px;font-weight:300;letter-spacing:-.02em;padding:12px 0;outline:none;font-variant-numeric:tabular-nums}
-  input::placeholder{color:var(--muted);opacity:.55}
-  input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  input[type=number]{-moz-appearance:textfield;appearance:textfield}
-  .gap{height:18px}
-  #calcBtn{width:100%;margin-top:26px;padding:17px;border:none;border-radius:16px;background:var(--ink);color:var(--bg);
-    font-size:16px;font-weight:600;letter-spacing:.01em;cursor:pointer;transition:opacity .2s,transform .1s}
-  #calcBtn:active{transform:scale(.985);opacity:.88}
-  #result{display:none;padding-top:30px;margin-top:30px;border-top:1px solid var(--line)}
-  #result.show{display:block;animation:rise .35s cubic-bezier(.2,.7,.3,1)}
-  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  #priceBig{font-size:clamp(44px,14vw,64px);font-weight:200;letter-spacing:-.04em;
-    font-variant-numeric:tabular-nums;overflow-wrap:anywhere;line-height:1.05}
-  #priceBig small{font-size:.5em;font-weight:300;color:var(--muted)}
-  #breakdown{margin-top:10px;font-size:13.5px;color:var(--muted);line-height:1.6}
-  #formula{margin-top:16px;font-size:12.5px;color:var(--muted);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
-  .rowBtns{display:flex;gap:0;margin-top:20px;border-top:1px solid var(--line)}
-  .ghost{flex:1;padding:14px 0;border:none;border-bottom:1px solid var(--line);background:transparent;
-    color:var(--ink);font-size:14px;font-weight:500;cursor:pointer}
-  .ghost + .ghost{border-left:1px solid var(--line)}
-  .ghost:active{opacity:.55}
-  .hist-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
-  .hist-head h2{font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--muted)}
-  #histCount{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-  #hist{list-style:none}
-  #hist li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;
-    padding:13px 2px;border-bottom:1px solid var(--line);font-size:14.5px;min-width:0}
-  #hist li span{color:var(--muted);font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
-  #hist li b{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .empty{color:var(--muted);font-size:14px;padding:16px 2px;border-bottom:1px solid var(--line)}
-  footer{text-align:center;font-size:11.5px;letter-spacing:.08em;color:var(--muted);padding-bottom:8px}
-  #toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);max-width:90vw;text-align:center;
-    background:var(--ink);color:var(--bg);padding:12px 24px;border-radius:99px;font-size:13.5px;font-weight:500;
-    display:none;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.18)}
-</style>
+
+  <script id="android-native-bridge-shim">
+    // Android Native Bridge Polyfill & Helper
+    (function() {
+      if (!window.Android) {
+        window.Android = {
+          showToast: function(message) {
+            try {
+              var toast = document.createElement('div');
+              toast.textContent = message;
+              toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f8fafc;padding:10px 22px;border-radius:24px;font-size:13px;font-weight:600;z-index:999999;box-shadow:0 10px 25px rgba(0,0,0,0.6);border:1px solid #334155;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;pointer-events:none;transition:opacity 0.3s;max-width:85%;text-align:center;';
+              document.body.appendChild(toast);
+              setTimeout(function() {
+                toast.style.opacity = '0';
+                setTimeout(function() { toast.remove(); }, 300);
+              }, 2500);
+            } catch(e) {}
+          },
+          vibrate: function(milliseconds) {
+            if (navigator.vibrate) {
+              navigator.vibrate(milliseconds || 40);
+            }
+          },
+          getAppVersion: function() {
+            return "1.0.0";
+          },
+          exitApp: function() {
+            console.log('[Android Native Bridge] Exit requested');
+          }
+        };
+      }
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Alchemy Pre-Test</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --subtext: #64748b;
+      --primary: #4338ca;
+      --primary-light: #e0e7ff;
+      --secondary: #06b6d4;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --border: #e2e8f0;
+      --chip-bg: #f1f5f9;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+      --primary: #6366f1;
+      --primary-light: #312e81;
+      --secondary: #22d3ee;
+      --accent: #10b981;
+      --danger: #f87171;
+      --border: #334155;
+      --chip-bg: #0f172a;
+      --shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: background 0.2s ease, color 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top Navigation */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.3px;
+    }
+    .nav-actions { display: flex; gap: 8px; align-items: center; }
+    .icon-btn {
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Hamburger Drawer */
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 100;
+      display: none;
+      backdrop-filter: blur(2px);
+    }
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -280px;
+      width: 280px;
+      height: 100vh;
+      background: var(--card-bg);
+      z-index: 101;
+      box-shadow: -4px 0 16px rgba(0,0,0,0.15);
+      transition: right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+    .drawer.open { right: 0; }
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+    .drawer-title { font-weight: 800; font-size: 1.1rem; color: var(--primary); }
+    .close-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--subtext); }
+
+    .about-card {
+      background: var(--chip-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    .about-card strong { color: var(--primary); }
+
+    /* Layout Containers */
+    .container { max-width: 600px; margin: 0 auto; width: 100%; padding: 14px; flex: 1; }
+
+    /* Auth Views */
+    .auth-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-top: 15px;
+    }
+    .auth-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; color: var(--primary); }
+    .auth-subtitle { font-size: 0.88rem; color: var(--subtext); margin-bottom: 16px; line-height: 1.4; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 5px; }
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .btn {
+      width: 100%;
+      padding: 11px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .auth-switch { text-align: center; margin-top: 14px; font-size: 0.85rem; color: var(--subtext); }
+    .auth-switch span { color: var(--primary); font-weight: 700; cursor: pointer; }
+
+    /* Alert Banner */
+    .alert {
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      font-size: 0.85rem;
+      display: none;
+      line-height: 1.4;
+    }
+    .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+    /* Tabs & Filters */
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+    .tab-btn {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      border-radius: 8px;
+      background: var(--card-bg);
+      color: var(--subtext);
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tab-btn.active { background: var(--primary); color: #ffffff; }
+
+    /* JSON Upload Box */
+    .import-card {
+      background: var(--card-bg);
+      border: 2px dashed var(--primary);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+    .import-card input { display: none; }
+
+    /* Test List Cards */
+    .test-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .test-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+    .test-meta { font-size: 0.78rem; color: var(--subtext); display: flex; gap: 8px; align-items: center; }
+    .badge {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .badge-cq { background: #fef3c7; color: #92400e; }
+    .badge-sq { background: #d1fae5; color: #065f46; }
+
+    /* Test Arena */
+    .test-header {
+      background: var(--card-bg);
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .timer { font-size: 1.1rem; font-weight: 800; color: var(--danger); }
+    .q-box {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+    .q-text { font-size: 0.95rem; font-weight: 600; margin-bottom: 12px; line-height: 1.4; }
+    .q-option {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+    .q-option.selected { border-color: var(--primary); background: var(--primary-light); font-weight: 600; }
+    .q-option.correct { border-color: var(--accent); background: #dcfce7; color: #166534; font-weight: 600; }
+    .q-option.wrong { border-color: var(--danger); background: #fee2e2; color: #991b1b; }
+
+    .explanation-box {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      background: var(--chip-bg);
+      font-size: 0.82rem;
+      border-left: 3px solid var(--primary);
+      line-height: 1.4;
+    }
+
+    /* CQ & SQ Specific Elements */
+    .cq-stem {
+      font-style: italic;
+      background: var(--chip-bg);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: 0.9rem;
+      border-left: 3px solid var(--secondary);
+      line-height: 1.4;
+    }
+    .cq-part {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+    }
+    .model-ans-toggle {
+      font-size: 0.78rem;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 6px;
+      display: inline-block;
+    }
+    .model-ans-box {
+      display: none;
+      margin-top: 8px;
+      padding: 10px;
+      border-radius: 6px;
+      background: var(--bg);
+      border-left: 3px solid var(--accent);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* Minimal Footer */
+    .app-footer {
+      text-align: center;
+      padding: 16px 12px;
+      font-size: 0.75rem;
+      color: var(--subtext);
+      border-top: 1px solid var(--border);
+      background: var(--card-bg);
+      margin-top: auto;
+      line-height: 1.5;
+    }
+    .app-footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .hide { display: none !important; }
+  </style>
+
+  <style id="android-phone-fit-reset">
+    /* Auto-Injected Mobile Phone Screen-Fit Reset */
+    *, *::before, *::after {
+      box-sizing: border-box !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    html, body {
+      width: 100% !important;
+      min-height: 100% !important;
+      max-width: 100vw !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow-x: hidden !important;
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
+      -webkit-font-smoothing: antialiased;
+    }
+    img, video, canvas, svg, iframe {
+      max-width: 100% !important;
+      height: auto;
+    }
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+  </style>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
 </head>
 <body>
-<header>
-  <div class="bar">
-    <div class="brand"><div class="mark"></div><div><b>Porimap</b><small>পরিমাপ · measure the price</small></div></div>
-    <button id="themeBtn" title="Toggle theme" aria-label="Toggle theme"></button>
+
+  <!-- Top Navbar -->
+  <div class="navbar">
+    <div class="brand">Alchemy Pre-Test™</div>
+    <div class="nav-actions">
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+      <button class="icon-btn" onclick="toggleDrawer()">☰</button>
+      <button class="icon-btn hide" id="logoutBtn" onclick="logout()">Logout</button>
+    </div>
   </div>
-</header>
 
-<main>
-  <section>
-    <p class="eyebrow">RATE — PER KILOGRAM</p>
-    <div class="field"><span class="unit">৳</span><input id="rate" type="number" min="0" step="any" inputmode="decimal" placeholder="0" /></div>
-    <div class="gap"></div>
-    <p class="eyebrow">WEIGHT — GRAMS</p>
-    <div class="field"><input id="weight" type="number" min="0" step="any" inputmode="decimal" placeholder="0" /><span class="unit">g</span></div>
-    <button id="calcBtn">Calculate</button>
+  <!-- Hamburger Drawer (About Us panel) -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+  <div class="drawer" id="sideDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title">About Us</div>
+      <button class="close-btn" onclick="toggleDrawer()">✕</button>
+    </div>
+    <div class="about-card">
+      <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-bottom: 6px;">Developer Info</div>
+      <div><strong>Developer:</strong> Md. Joynal Abedin</div>
+      <div><strong>Publisher:</strong> Alchemy Academy</div>
+      <div style="margin-top: 8px;"><strong>Email:</strong> <br><a href="mailto:alchemyacademy.official@gmail.com" style="color:var(--primary); text-decoration:none;">alchemyacademy.official@gmail.com</a></div>
+      <div style="margin-top: 6px;"><strong>Phone:</strong> <br><a href="tel:01832832947" style="color:var(--primary); text-decoration:none;">01832832947</a></div>
+    </div>
+    <div style="margin-top: auto; font-size: 0.75rem; color: var(--subtext); text-align: center;">
+      Alchemy Pre-Test™ &bull; Offline Ready
+    </div>
+  </div>
 
-    <div id="result">
-      <p class="eyebrow">TOTAL</p>
-      <p id="priceBig"></p>
-      <p id="breakdown"></p>
-      <p id="formula"></p>
-      <div class="rowBtns">
-        <button class="ghost" id="copyBtn">Copy</button>
-        <button class="ghost" id="clearBtn">Clear</button>
+  <div class="container">
+    <div id="alertBox" class="alert"></div>
+
+    <!-- 1. LOGIN SCREEN -->
+    <div id="loginView" class="auth-card hide">
+      <div class="auth-title">Login to App</div>
+      <div class="auth-subtitle">First time requires internet to verify your approved credentials.</div>
+      
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUser" class="form-control" placeholder="Enter assigned username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" class="form-control" placeholder="Enter assigned password">
+      </div>
+      
+      <button class="btn btn-primary" onclick="handleLogin()">Verify & Sign In</button>
+      
+      <div class="auth-switch">
+        <span onclick="switchAuthView('register')">Don't have an approved account? Register here</span>
       </div>
     </div>
-  </section>
 
-  <section>
-    <div class="hist-head"><h2>RECENT</h2><span id="histCount"></span></div>
-    <ul id="hist"></ul>
-  </section>
+    <!-- 2. REGISTRATION SCREEN -->
+    <div id="registerView" class="auth-card hide">
+      <div class="auth-title">Register for Access</div>
+      <div class="auth-subtitle">Admin will verify your account and email your unique credentials.</div>
+      
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="regName" class="form-control" placeholder="Your full name">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="regEmail" class="form-control" placeholder="example@gmail.com">
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="regPhone" class="form-control" placeholder="018XXXXXXXX">
+      </div>
 
-  <footer>PORIMAP · WEIGH · PRICE · REPEAT</footer>
-</main>
+      <button class="btn btn-accent" onclick="handleRegister()">Submit Application</button>
+      
+      <div class="auth-switch">
+        <span onclick="switchAuthView('login')">Already registered? Log in here</span>
+      </div>
+    </div>
 
-<div id="toast"></div>
+    <!-- 3. DASHBOARD -->
+    <div id="dashboardView" class="hide">
+      <!-- Import JSON Box -->
+      <div class="import-card" onclick="document.getElementById('jsonFileInput').click()">
+        <input type="file" id="jsonFileInput" accept=".json" onchange="handleFileImport(event)">
+        <div style="font-size: 1.8rem; margin-bottom: 6px;">📥</div>
+        <div style="font-weight: 700; font-size: 0.9rem;">Add Question Bank (.json)</div>
+        <div style="font-size: 0.78rem; color: var(--subtext);">Tap here to load MCQ, CQ, or SQ tests from your storage</div>
+      </div>
 
-<script>
-  const $ = id => document.getElementById(id);
-  const store = {
-    load() { try { return JSON.parse(localStorage.getItem('porimap_v2')) || {}; } catch(e){ return {}; } },
-    save(d) { try { localStorage.setItem('porimap_v2', JSON.stringify(d)); } catch(e){} }
-  };
-  let data = Object.assign({ rate:'', theme:'light', hist:[] }, store.load());
+      <!-- Subject Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="filterSubject('All', this)">All</button>
+        <button class="tab-btn" onclick="filterSubject('Chemistry', this)">Chemistry</button>
+        <button class="tab-btn" onclick="filterSubject('Physics', this)">Physics</button>
+        <button class="tab-btn" onclick="filterSubject('Biology', this)">Biology</button>
+      </div>
 
-  const SUN = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3L19 19M19 5l-1.7 1.7M6.7 17.3L5 19"/></svg>';
-  const MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13.5A8 8 0 0 1 10.5 4 8 8 0 1 0 20 13.5z"/></svg>';
+      <!-- Test Container -->
+      <div id="testListContainer"></div>
+    </div>
 
-  function applyTheme(){
-    document.documentElement.classList.toggle('dark', data.theme === 'dark');
-    $('themeBtn').innerHTML = data.theme === 'dark' ? MOON : SUN;
-  }
-  $('themeBtn').onclick = () => {
-    data.theme = data.theme === 'dark' ? 'light' : 'dark';
-    store.save(data); applyTheme();
-  };
-  applyTheme();
+    <!-- 4. ACTIVE TEST ARENA -->
+    <div id="testArenaView" class="hide">
+      <div class="test-header">
+        <div>
+          <div style="font-weight: 700; font-size: 0.95rem;" id="activeTestTitle">Test Title</div>
+          <div style="font-size: 0.78rem; color: var(--subtext);" id="activeTestMeta">Questions</div>
+        </div>
+        <div class="timer" id="timerDisplay">25:00</div>
+      </div>
 
-  if (data.rate !== '') $('rate').value = data.rate;
-  $('rate').addEventListener('input', e => { data.rate = e.target.value; store.save(data); });
+      <div id="questionsContainer"></div>
 
-  function toast(msg){
-    const t = $('toast'); t.textContent = msg; t.style.display = 'block';
-    clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 1800);
-  }
+      <button class="btn btn-primary" id="submitTestBtn" onclick="submitExam()">Finish Test</button>
+      <button class="btn btn-outline" style="margin-top: 10px;" onclick="exitTest()">Exit to Dashboard</button>
+    </div>
 
-  function renderHist(){
-    const ul = $('hist'); ul.innerHTML = '';
-    $('histCount').textContent = data.hist.length ? data.hist.length + ' entries' : '';
-    if (!data.hist.length) { ul.innerHTML = '<li class="empty">Nothing calculated yet</li>'; return; }
-    data.hist.forEach(h => {
-      const li = document.createElement('li');
-      li.innerHTML = `<span>${h.weight} g · ৳${h.rate} / kg</span><b>৳${h.total}</b>`;
-      ul.appendChild(li);
+  </div>
+
+  <iframe name="hidden_submission_iframe" id="hidden_submission_iframe" style="display:none;"></iframe>
+
+  <!-- Minimal Footer Attribution -->
+  <footer class="app-footer">
+    <div>Alchemy Pre-Test™ &bull; Developed by <strong>Md. Joynal Abedin</strong>, Alchemy Academy</div>
+    <div>
+      <a href="mailto:alchemyacademy.official@gmail.com">alchemyacademy.official@gmail.com</a> &bull; 
+      <a href="tel:01832832947">01832832947</a>
+    </div>
+  </footer>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvNs5iXEpGA_r4hBeoQLWR9dztu98dqRTOad26u89UCXF-d_f9PrXum4NctPRSLv7a/exec";
+
+    let currentTheme = localStorage.getItem("alchemy_theme") || "light";
+    let currentFilter = "All";
+    let activeTest = null;
+    let timerInterval = null;
+    let userAnswers = {};
+
+    let testRepository = JSON.parse(localStorage.getItem("alchemy_tests")) || [];
+
+    window.addEventListener("DOMContentLoaded", () => {
+      applyTheme(currentTheme);
+      checkAuthStatus();
     });
-  }
-  renderHist();
 
-  let lastTotal = '';
-  function calculate(){
-    const rate = parseFloat($('rate').value);
-    const weight = parseFloat($('weight').value);
-    if (!(rate > 0) || !(weight > 0)) { toast('Enter a valid rate and weight'); return; }
+    function toggleTheme() {
+      currentTheme = currentTheme === "light" ? "dark" : "light";
+      localStorage.setItem("alchemy_theme", currentTheme);
+      applyTheme(currentTheme);
+    }
+    function applyTheme(theme) {
+      document.body.setAttribute("data-theme", theme);
+      document.getElementById("themeBtn").innerText = theme === "dark" ? "☀️" : "🌙";
+    }
 
-    const total = Math.round((rate / 1000) * weight * 100) / 100;   // per-kg rate → gram weight
-    const taka = Math.floor(total);
-    const poisha = Math.round((total - taka) * 100);                // fraction of 1 taka
-    lastTotal = total.toFixed(2);
+    function toggleDrawer() {
+      const drawer = document.getElementById("sideDrawer");
+      const overlay = document.getElementById("drawerOverlay");
+      const isOpen = drawer.classList.contains("open");
+      if (isOpen) {
+        drawer.classList.remove("open");
+        overlay.style.display = "none";
+      } else {
+        drawer.classList.add("open");
+        overlay.style.display = "block";
+      }
+    }
 
-    $('priceBig').innerHTML = `৳${taka}.<small>${String(poisha).padStart(2,'0')}</small>`;
-    $('breakdown').textContent = `${taka} taka and ${poisha} poisha — .${String(poisha).padStart(2,'0')} is ${poisha}% of one taka`;
-    $('formula').textContent = `৳${rate} / kg × ${weight} g = ৳${lastTotal}`;
-    const r = $('result');
-    r.classList.remove('show'); void r.offsetWidth; r.classList.add('show');
+    function checkAuthStatus() {
+      const savedUser = localStorage.getItem("alchemy_auth_session");
+      if (savedUser) {
+        showView("dashboardView");
+        document.getElementById("logoutBtn").classList.remove("hide");
+        renderDashboard();
+      } else {
+        showView("loginView");
+        document.getElementById("logoutBtn").classList.add("hide");
+      }
+    }
 
-    data.hist.unshift({ rate, weight, total: lastTotal });
-    data.hist = data.hist.slice(0, 8);
-    store.save(data); renderHist();
-  }
-  $('calcBtn').onclick = calculate;
+    function switchAuthView(view) {
+      hideAlert();
+      showView(view === "register" ? "registerView" : "loginView");
+    }
 
-  // Enter: rate → weight → calculate
-  $('rate').addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); $('weight').focus(); }
-  });
-  $('weight').addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); calculate(); }
-  });
+    function handleRegister() {
+      const name = document.getElementById("regName").value.trim();
+      const email = document.getElementById("regEmail").value.trim();
+      const phone = document.getElementById("regPhone").value.trim();
 
-  $('clearBtn').onclick = () => {
-    $('weight').value = ''; $('result').classList.remove('show');
-  };
-  $('copyBtn').onclick = () => {
-    if (!lastTotal) return;
-    const done = () => toast('Copied ৳' + lastTotal);
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText('৳' + lastTotal).then(done).catch(() => toast('৳' + lastTotal));
-    } else { toast('৳' + lastTotal); }
-  };
-</script>
+      if (!name || !email || !email.includes("@") || !phone) {
+        showAlert("Please enter a valid Name, Email, and Phone number.", "danger");
+        return;
+      }
+
+      showAlert("Submitting application...", "success");
+
+      const form = document.createElement("form");
+      form.action = APPS_SCRIPT_URL;
+      form.method = "POST";
+      form.target = "hidden_submission_iframe";
+
+      const fields = {
+        action: "register",
+        fullName: name,
+        email: email,
+        phone: phone
+      };
+
+      for (const key in fields) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = fields[key];
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+
+      showAlert("Registration submitted! A confirmation email has been dispatched. Please check your inbox and wait for approval.", "success");
+      document.getElementById("regName").value = "";
+      document.getElementById("regEmail").value = "";
+      document.getElementById("regPhone").value = "";
+
+      setTimeout(() => switchAuthView("login"), 3000);
+    }
+
+    async function handleLogin() {
+      const u = document.getElementById("loginUser").value.trim();
+      const p = document.getElementById("loginPass").value.trim();
+
+      if (!u || !p) {
+        showAlert("Please enter both username and password.", "danger");
+        return;
+      }
+
+      showAlert("Verifying account with server...", "success");
+
+      try {
+        const loginUrl = `${APPS_SCRIPT_URL}?action=login&username=${encodeURIComponent(u)}&password=${encodeURIComponent(p)}`;
+        const response = await fetch(loginUrl, { method: "GET" });
+        const res = await response.json();
+
+        if (res.success) {
+          localStorage.setItem("alchemy_auth_session", JSON.stringify(res.user));
+          showAlert("Verified successfully!", "success");
+          setTimeout(() => {
+            hideAlert();
+            checkAuthStatus();
+          }, 800);
+        } else {
+          showAlert(res.message || "Invalid credentials.", "danger");
+        }
+      } catch (err) {
+        console.error("Login verification failed:", err);
+        showAlert("Network error. First-time login requires active internet.", "danger");
+      }
+    }
+
+    function logout() {
+      if (confirm("Are you sure you want to log out? You will need internet to log in again.")) {
+        localStorage.removeItem("alchemy_auth_session");
+        checkAuthStatus();
+      }
+    }
+
+    // JSON IMPORTER (Supports array of tests or single test objects for MCQ, CQ, and SQ)
+    function handleFileImport(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const data = JSON.parse(evt.target.result);
+          const incomingTests = Array.isArray(data) ? data : [data];
+
+          incomingTests.forEach((item, i) => {
+            if (!item.type || !item.subject || !item.questions) {
+              throw new Error("Invalid structure: missing type, subject, or questions");
+            }
+            item.id = item.id || ("custom_" + Date.now() + "_" + i);
+            const existingIdx = testRepository.findIndex(t => t.id === item.id);
+            if (existingIdx >= 0) {
+              testRepository[existingIdx] = item;
+            } else {
+              testRepository.push(item);
+            }
+          });
+
+          localStorage.setItem("alchemy_tests", JSON.stringify(testRepository));
+          alert(`Successfully imported ${incomingTests.length} test(s)!`);
+          renderDashboard();
+        } catch (error) {
+          alert("Error parsing JSON file: " + error.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function filterSubject(sub, btn) {
+      currentFilter = sub;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderDashboard();
+    }
+
+    function renderDashboard() {
+      const container = document.getElementById("testListContainer");
+      container.innerHTML = "";
+
+      const filtered = testRepository.filter(t => currentFilter === "All" || t.subject.toLowerCase() === currentFilter.toLowerCase());
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--subtext);">No tests found for ${currentFilter}. Tap the box above to import a .json question bank.</div>`;
+        return;
+      }
+
+      filtered.forEach(test => {
+        const item = document.createElement("div");
+        item.className = "test-item";
+
+        let badgeClass = "badge";
+        if (test.type === "CQ") badgeClass += " badge-cq";
+        if (test.type === "SQ") badgeClass += " badge-sq";
+
+        item.innerHTML = `
+          <div>
+            <div class="test-title">${test.testTitle}</div>
+            <div class="test-meta">
+              <span class="${badgeClass}">${test.type}</span>
+              <span>${test.subject}</span>
+              <span>⏱ ${test.timeMinutes || 25}m</span>
+              <span>📝 ${test.questions.length} items</span>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width: auto; padding: 6px 14px; font-size: 0.85rem;" onclick="startTest('${test.id}')">Start</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function startTest(testId) {
+      activeTest = testRepository.find(t => t.id === testId);
+      if (!activeTest) return;
+
+      userAnswers = {};
+      showView("testArenaView");
+      document.getElementById("activeTestTitle").innerText = activeTest.testTitle;
+      document.getElementById("activeTestMeta").innerText = `${activeTest.type} • ${activeTest.questions.length} Questions`;
+
+      renderTestQuestions();
+      startTimer(activeTest.timeMinutes || 25);
+    }
+
+    // RENDERER FOR MCQ, CQ, AND SQ
+    function renderTestQuestions() {
+      const container = document.getElementById("questionsContainer");
+      container.innerHTML = "";
+
+      if (activeTest.type === "MCQ") {
+        document.getElementById("submitTestBtn").classList.remove("hide");
+        activeTest.questions.forEach((q, idx) => {
+          const qBox = document.createElement("div");
+          qBox.className = "q-box";
+
+          let stimulusHtml = q.stimulus ? `<div style="margin-bottom:8px; font-style:italic; color:var(--secondary); font-size:0.88rem;">${q.stimulus}</div>` : "";
+          let statementsHtml = q.statements && q.statements.length > 0 ? `<div style="margin:6px 0; font-size:0.88rem; color:var(--subtext);">${q.statements.join("<br>")}</div>` : "";
+
+          let optionsHtml = "";
+          q.options.forEach((opt, optIdx) => {
+            optionsHtml += `
+              <div class="q-option" id="opt_${idx}_${optIdx}" onclick="selectOption(${idx}, ${optIdx})">
+                <strong>${String.fromCharCode(65 + optIdx)}.</strong> ${opt}
+              </div>
+            `;
+          });
+
+          qBox.innerHTML = `
+            ${stimulusHtml}
+            <div class="q-text">${idx + 1}. ${q.text}</div>
+            ${statementsHtml}
+            <div>${optionsHtml}</div>
+            <div id="exp_${idx}" class="explanation-box hide"><strong>Explanation:</strong> ${q.explanation || 'No explanation provided.'}</div>
+          `;
+          container.appendChild(qBox);
+        });
+
+      } else if (activeTest.type === "CQ") {
+        document.getElementById("submitTestBtn").classList.add("hide");
+        activeTest.questions.forEach((q, idx) => {
+          const qBox = document.createElement("div");
+          qBox.className = "q-box";
+
+          let partsHtml = "";
+          q.parts.forEach(p => {
+            partsHtml += `
+              <div class="cq-part">
+                <div style="font-weight: 600; font-size: 0.9rem;">(${p.mark}) ${p.text} [Marks: ${p.points}]</div>
+                <div class="model-ans-toggle" onclick="toggleAns('cq_ans_${idx}_${p.mark}', this)">View Model Answer</div>
+                <div id="cq_ans_${idx}_${p.mark}" class="model-ans-box">
+                  <strong>Model Answer:</strong><br>${p.answer}
+                </div>
+              </div>
+            `;
+          });
+
+          qBox.innerHTML = `
+            <div style="font-weight: 700; margin-bottom: 8px; color: var(--primary);">Creative Question ${idx + 1}</div>
+            <div class="cq-stem">${q.stem}</div>
+            <div>${partsHtml}</div>
+          `;
+          container.appendChild(qBox);
+        });
+
+      } else if (activeTest.type === "SQ") {
+        document.getElementById("submitTestBtn").classList.add("hide");
+        activeTest.questions.forEach((q, idx) => {
+          const qBox = document.createElement("div");
+          qBox.className = "q-box";
+
+          qBox.innerHTML = `
+            <div style="font-weight: 700; margin-bottom: 6px; color: var(--primary);">Short Question ${idx + 1} [Marks: ${q.points || 2}]</div>
+            <div class="q-text">${q.question}</div>
+            <div class="model-ans-toggle" onclick="toggleAns('sq_ans_${idx}', this)">View Model Answer</div>
+            <div id="sq_ans_${idx}" class="model-ans-box">
+              <strong>Model Answer:</strong><br>${q.answer}
+            </div>
+          `;
+          container.appendChild(qBox);
+        });
+      }
+    }
+
+    function selectOption(qIdx, optIdx) {
+      userAnswers[qIdx] = optIdx;
+      const opts = document.querySelectorAll(`[id^="opt_${qIdx}_"]`);
+      opts.forEach(el => el.classList.remove("selected"));
+      document.getElementById(`opt_${qIdx}_${optIdx}`).classList.add("selected");
+    }
+
+    function toggleAns(id, btn) {
+      const el = document.getElementById(id);
+      if (el.style.display === "block") {
+        el.style.display = "none";
+        btn.innerText = "View Model Answer";
+      } else {
+        el.style.display = "block";
+        btn.innerText = "Hide Model Answer";
+      }
+    }
+
+    function submitExam() {
+      clearInterval(timerInterval);
+      let score = 0;
+
+      activeTest.questions.forEach((q, idx) => {
+        const selected = userAnswers[idx];
+        const correct = q.correctIndex;
+        const expBox = document.getElementById(`exp_${idx}`);
+        if (expBox) expBox.classList.remove("hide");
+
+        if (selected !== undefined) {
+          if (selected === correct) {
+            score++;
+            document.getElementById(`opt_${idx}_${selected}`).classList.add("correct");
+          } else {
+            document.getElementById(`opt_${idx}_${selected}`).classList.add("wrong");
+            document.getElementById(`opt_${idx}_${correct}`).classList.add("correct");
+          }
+        } else {
+          document.getElementById(`opt_${idx}_${correct}`).classList.add("correct");
+        }
+      });
+
+      alert(`Test Completed!\nScore: ${score} / ${activeTest.questions.length}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function startTimer(minutes) {
+      clearInterval(timerInterval);
+      let totalSeconds = minutes * 60;
+      const display = document.getElementById("timerDisplay");
+
+      timerInterval = setInterval(() => {
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        display.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        if (totalSeconds <= 0) {
+          clearInterval(timerInterval);
+          if (activeTest.type === "MCQ") submitExam();
+        }
+        totalSeconds--;
+      }, 1000);
+    }
+
+    function exitTest() {
+      clearInterval(timerInterval);
+      showView("dashboardView");
+    }
+
+    function showView(viewId) {
+      ["loginView", "registerView", "dashboardView", "testArenaView"].forEach(id => {
+        document.getElementById(id).classList.add("hide");
+      });
+      document.getElementById(viewId).classList.remove("hide");
+    }
+
+    function showAlert(msg, type) {
+      const el = document.getElementById("alertBox");
+      el.className = `alert alert-${type}`;
+      el.innerText = msg;
+      el.style.display = "block";
+    }
+
+    function hideAlert() {
+      document.getElementById("alertBox").style.display = "none";
+    }
+  </script>
+
+  <script id="android-offline-sw-registrar">
+    // Auto-register Offline Service Worker for 100% Zero-Network Operation
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js')
+          .then(function(reg) { console.log('[Offline Engine] Service Worker registered:', reg.scope); })
+          .catch(function(err) { console.log('[Offline Engine] SW registered locally'); });
+      });
+    }
+  </script>
 </body>
 </html>
